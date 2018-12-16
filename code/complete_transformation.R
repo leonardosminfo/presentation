@@ -80,10 +80,10 @@ source(file=paste(path,"code/complete_data_normalization.R",sep=""))
 #View(head(vra_wu_cl_tf_nzscore))
 
 ######################################################################################
-##DATA SAMPLING
+##DATA SAMPLING (80/20)
 
 
-###CARREGANDO DADOS
+###LOADING DATA
 vra_wu_cl_imp_tf_nminmax=readRDS(paste(path,"dataset/vra_wu_cl_imp_tf_nminmax.RData",sep=""))
 vra_wu_cl_imp_tf_nzscore=readRDS(paste(path,"dataset/vra_wu_cl_imp_tf_nzscore.RData",sep=""))
 vra_wu_cl_tf_nminmax=readRDS(paste(path,"dataset/vra_wu_cl_tf_nminmax.RData",sep=""))
@@ -95,7 +95,11 @@ gc()
 
 ##DATA REDUCTION
 
-#sum(is.na(vra_wu_cl_imp_tf_nminmax_tr))
+#sum(is.na(vra_wu_cl_imp_tf_nminmax_tr)) #145177
+#sum(is.na(vra_wu_cl_tf_nzscore_tr)) #64528
+#sum(is.na(vra_wu_cl_tf_nminmax_tr)) #64528
+#sum(is.na(vra_wu_cl_imp_tf_nzscore_tr)) #145177
+
 ###LOADING DATA
 
 vra_wu_cl_tf_nminmax_tr=readRDS(paste(path,"dataset/vra_wu_cl_tf_nminmax_tr.RData",sep=""))
@@ -108,7 +112,7 @@ vra_wu_cl_imp_tf_nzscore_tr=readRDS(paste(path,"dataset/vra_wu_cl_imp_tf_nzscore
 #vra_wu_cl_imp_tf_nzscore_tst=readRDS("~/New-Flight-Delay/Transformation_New_ord/dataset/vra_wu_cl_imp_tf_nzscore_tst.RData")
 
 source(file=paste(path,"code/complete_data_reduction.R",sep=""))
-
+#rm(vra_wu_cl_tf_nminmax_tr)
 #####################################################################################
 
 ##DATA BALANCING

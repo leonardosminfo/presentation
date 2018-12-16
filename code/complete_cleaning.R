@@ -1,5 +1,5 @@
 setwd("~/Flight-Delay/Cleaning")
-options(java.parameters = "-Xmx32g")
+options(java.parameters = "-Xmx31g")
 load("~/Flight-Delay/Cleaning/dataset/vra-wu.RData")
 #load("E:/leonardosm/Documents/Mestrado/Monografia/novo_servidor/Brazilian-Flight-Delay/demonstracao/dataset/vra-wu.RData")
 path="~/Flight-Delay/Cleaning/"
