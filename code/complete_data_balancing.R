@@ -1,6 +1,4 @@
-
 source(file=paste(path,"code/myPreprocessing.R",sep=""))
-
 ##############################
 
 #Balancing
@@ -14,6 +12,7 @@ source(file=paste(path,"code/myPreprocessing.R",sep=""))
 
 #SMOTE(over)###########
 ###MINMAX
+
 vra_wu_tr_mm_ls.bo=balance.oversampling(vra_wu_tr_minmax_ls, "delayed")  #SMOTE
 vra_wu_imp_mm_tr_ls.bo=balance.oversampling(vra_wu_imp_minmax_tr_ls, "delayed")  #SMOTE
 saveRDS(vra_wu_tr_mm_ls.bo,paste(path,"dataset/vra_wu_tr_mm_ls.bo.RData",sep=""))

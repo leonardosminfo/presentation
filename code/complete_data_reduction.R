@@ -59,7 +59,7 @@ rm(vra_wu_tr_minmax_cfs)
 
 vra_wu_imp_minmax_tr_cfs <- fs.cfs(vra_wu_cl_imp_tf_nminmax_tr, "delayed") [[1]]
 saveRDS(vra_wu_imp_minmax_tr_cfs, paste(path,"dataset/vra_wu_imp_minmax_tr_cfs.RData",sep=""))
-rm(vra_wu_tr_minmax_cfs,vra_wu_imp_minmax_tr_cfs)
+rm(vra_wu_imp_minmax_tr_cfs)
 gc()
 
 #zscore
@@ -77,6 +77,9 @@ gc()
 #minmax
 vra_wu_tr_minmax_pca <- dt.pca(vra_wu_cl_tf_nminmax_tr, "delayed") [[1]]
 saveRDS(vra_wu_tr_minmax_pca, paste(path,"dataset/vra_wu_tr_minmax_pca.RData",sep=""))
+#vra_wu_tr_minmax_pca <- dt.pca2(vra_wu_cl_tf_nminmax_tr, "delayed") [[1]]
+#saveRDS(vra_wu_tr_minmax_pca, paste(path,"dataset/vra_wu_tr_minmax_pca2.RData",sep=""))
+
 rm(vra_wu_tr_minmax_pca)
 gc()
 

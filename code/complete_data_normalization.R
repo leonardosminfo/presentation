@@ -49,5 +49,6 @@ saveRDS(vra_wu_cl_tf_nzscore, paste(path,"dataset/vra_wu_cl_tf_nzscore.RData",se
 
 
 rm(vra_wu_cl_tf_nminmax,vra_wu_cl_tf_nzscore)
+rm(dtminmax,dtzscore)
 gc()
 

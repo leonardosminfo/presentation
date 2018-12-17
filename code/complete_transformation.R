@@ -1,21 +1,4 @@
-#Restart and load another packets before this line
-options(java.parameters = "-Xmx32g")
-################
-#PATH
-path="~/Flight-Delay/Cleaning/"
-
-#paste(path,"",sep="")
-#####################################################
-source(file=paste(path,"code/myPreprocessing.R",sep=""))
-loadlibrary("tidyr")
-loadlibrary("stringr")
-loadlibrary("ggplot2")
-loadlibrary("corrplot")
-loadlibrary("DMwR")
-
-##############################
-#CARREGANDO DADOS
-
+#LOADING DATA
 vra_wu_cleaned=readRDS(paste(path,"dataset/VRA_WU_CLEANED.RData",sep=""))
 vra_wu_cleaned_imp=readRDS(paste(path,"dataset/VRA_WU_CLEANED_WITH_IMPUTED_DATA.RData",sep=""))
 
@@ -28,14 +11,13 @@ sum(is.na(vra_wu_cleaned_imp))  #0
 ##############################
 
 ###STRATIFIED SAmPLE TO LOCAL TEST
-#local="ok"
 if(local=="ok")
   {
-  vra_wu_cleaned_strat <- sample.stratified(data=vra_wu_cleaned, clabel="delayed", perc=0.01)[1]$sample
-  vra_wu_cleaned_imp_strat <- sample.stratified(data=vra_wu_cleaned_imp, clabel="delayed", perc=0.01)[1]$sample
+  vra_wu_cleaned <- sample.stratified(data=vra_wu_cleaned, clabel="delayed", perc=0.01)[1]$sample
+  vra_wu_cleaned_imp <- sample.stratified(data=vra_wu_cleaned_imp, clabel="delayed", perc=0.01)[1]$sample
   
-  saveRDS(vra_wu_cleaned_strat, paste(path,"dataset/vra_wu_cleaned_new_stratified.RData",sep=""))
-  saveRDS(vra_wu_cleaned_imp_strat, paste(path,"dataset/vra_wu_cleaned_imp_new_stratified.RData",sep="")) 
+  saveRDS(vra_wu_cleaned, paste(path,"dataset/vra_wu_cleaned_new_stratified.RData",sep=""))
+  saveRDS(vra_wu_cleaned_imp, paste(path,"dataset/vra_wu_cleaned_imp_new_stratified.RData",sep="")) 
 }
 ######################################################################################
 
@@ -58,7 +40,8 @@ sum(is.na(vra_wu_cl_tf)) #80651
 sum(is.na(vra_wu_cl_imp_tf)) #181562
 
 gc()
-View(head(vra_wu_cl_tf))
+#View(head(vra_wu_cl_tf))
+
 #until correcting discretization problems
 #vra_wu_cl_tf=na.omit(vra_wu_cl_tf)
 #vra_wu_cl_imp_tf=na.omit(vra_wu_cl_imp_tf)
@@ -111,6 +94,7 @@ vra_wu_cl_imp_tf_nminmax_tr=readRDS(paste(path,"dataset/vra_wu_cl_imp_tf_nminmax
 vra_wu_cl_imp_tf_nzscore_tr=readRDS(paste(path,"dataset/vra_wu_cl_imp_tf_nzscore_tr.RData",sep=""))
 #vra_wu_cl_imp_tf_nzscore_tst=readRDS("~/New-Flight-Delay/Transformation_New_ord/dataset/vra_wu_cl_imp_tf_nzscore_tst.RData")
 
+
 source(file=paste(path,"code/complete_data_reduction.R",sep=""))
 #rm(vra_wu_cl_tf_nminmax_tr)
 #####################################################################################
@@ -144,7 +128,6 @@ vra_wu_imp_minmax_tr_pca=readRDS(paste(path,"dataset/vra_wu_imp_minmax_tr_pca.RD
 vra_wu_tr_zscore_pca=readRDS(paste(path,"dataset/vra_wu_tr_zscore_pca.RData",sep=""))
 vra_wu_imp_zscore_tr_pca=readRDS(paste(path,"dataset/vra_wu_imp_zscore_tr_pca.RData",sep=""))
 
-#tst=dt.pca(vra_wu_cl_imp_tf_nminmax, "delayed") [[1]]
 source(file=paste(path,"code/complete_data_balancing.R",sep=""))
 
 

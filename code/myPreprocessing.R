@@ -169,9 +169,37 @@ normalize.zscore <- function(data, norm.set=NULL, nmean=0, nsd=1)
 }
 
 # Data Transformation
+# PCA
+dt.pca2 <- function(data, class, transf = NULL)
+{
+  data = data.frame(data)
+  predictand = as.matrix(data[,class])
+  colnames(predictand) <- class
+  if (!is.numeric(data[,class]))
+    data[,class] =  as.numeric(data[,class])
+  nums = unlist(lapply(data, is.numeric))
+  vnums=!nums
+  dataaux= data[,vnums]
+  data = data[ , nums]
+  predictors_name  = setdiff(colnames(data), class)
+  predictors = as.matrix(data[,predictors_name])
+  if (is.null(transf)) {
+    pca_res = prcomp(predictors, center=TRUE, scale.=TRUE)
+    cumvar = cumsum(pca_res$sdev^2/sum(pca_res$sdev^2))
+    res = curvature.min(c(1:(length(cumvar))), cumvar)
+    transf=as.matrix(t(pca_res$rotation[,1:res$x]))
+  }
+    dataset = pca_res$x[,1:res$x] %*% transf
+    dataset=cbind(dataset,predictand)
+    dataset = data.frame(dataset)
+    dataset=fs.ig(dataset,class)$data
+    dataset=cbind(dataaux,dataset)
+    dataset = data.frame(dataset)
+  return (list(pca=dataset, pca.transf=transf))
+}
+
 
 # PCA
-
 dt.pca <- function(data, class, transf = NULL)
 {
   data = data.frame(data)
@@ -199,7 +227,7 @@ dt.categ_mapping <- function(data, attribute){
   mdlattribute = formula(paste("~", paste(attribute, "-1")))
   x <- model.matrix(mdlattribute, data=data)
   x=data.frame(x)
-  #x[] <- lapply(x, factor)
+  x[] <- lapply(x, factor)
   data <- cbind(data, x)
   data[,attribute] <- NULL
   return(data)
@@ -281,7 +309,6 @@ binning.opt <- function(v, binning=NULL, n=20) {
 
 
 # DATA BALANCING
-
 balance.oversampling <- function(data, class) {
   x <- sort((table(data[,class]))) 
   class_formula = formula(paste(class, "  ~ ."))
@@ -291,7 +318,8 @@ balance.oversampling <- function(data, class) {
     minorclass = names(x)[i]
     curdata = data[data[,class]==mainclass
                    | data[,class]==minorclass,]
-    curdata$Species <- factor(curdata$Species) 
+    #curdata$Species <- factor(curdata$Species)
+    curdata[,colnames(curdata)]<-lapply(curdata[,colnames(curdata)],factor)
     ratio <- as.integer(ceiling(x[length(x)]/x[i])*100)
     curdata <- SMOTE(class_formula, curdata, 
                      perc.over = ratio, perc.under=100)

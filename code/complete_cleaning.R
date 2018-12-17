@@ -1,31 +1,6 @@
-setwd("~/Flight-Delay/Cleaning")
-options(java.parameters = "-Xmx31g")
-load("~/Flight-Delay/Cleaning/dataset/vra-wu.RData")
-#load("E:/leonardosm/Documents/Mestrado/Monografia/novo_servidor/Brazilian-Flight-Delay/demonstracao/dataset/vra-wu.RData")
-path="~/Flight-Delay/Cleaning/"
-#path="E:/leonardosm/Documents/Mestrado/Monografia/novo_servidor/Brazilian-Flight-Delay/demonstracao/"
-#######################
 
-loadlibrary <- function(x)
-{
-  if (!require(x,character.only = TRUE))
-  {
-    install.packages(x, repos='http://cran.fiocruz.br', dep=TRUE)
-    if(!require(x,character.only = TRUE)) stop("Package not found")
-  }
-}
-
-
-#######################
-loadlibrary("dplyr")
-loadlibrary("caret")
-loadlibrary("dplyr")
-loadlibrary("tidyr")
-loadlibrary("stringr")
-loadlibrary("ggplot2")
-loadlibrary("corrplot")
-
-
+load(paste(path,"dataset/vra-wu.RData",sep=""))
+##################################
 glimpse(vra_wu)
 
 #features with caracteres

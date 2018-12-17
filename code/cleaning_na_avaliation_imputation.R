@@ -1,31 +1,6 @@
 
-path="~/Flight-Delay/Cleaning/"
-#path="E:/leonardosm/Documents/Mestrado/Monografia/novo_servidor/Brazilian-Flight-Delay/demonstracao/"
-
-#######################
-
-loadlibrary <- function(x)
-{
-  if (!require(x,character.only = TRUE))
-  {
-    install.packages(x, repos='http://cran.fiocruz.br', dep=TRUE)
-    if(!require(x,character.only = TRUE)) stop("Package not found")
-  }
-}
-
-
-#######################
-loadlibrary("dplyr")
-loadlibrary("caret")
-loadlibrary("dplyr")
-loadlibrary("tidyr")
-loadlibrary("stringr")
-loadlibrary("ggplot2")
-loadlibrary("corrplot")
-#############################
-
 vra_wu_cl=readRDS(paste(path,"dataset/vra_wu_cl.RData",sep=""))
-
+############################
 
 #VERIFYING MISSING DATA
 
