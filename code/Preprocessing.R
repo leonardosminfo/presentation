@@ -7,13 +7,7 @@ source("https://raw.githubusercontent.com/leonardosminfo/presentation/master/cod
 
 source("https://raw.githubusercontent.com/leonardosminfo/presentation/master/code/myPrediction.R")
 
-#options(java.parameters = "-Xmx31g")
 
-#source("https://raw.githubusercontent.com/eogasawara/mylibrary/master/myPreprocessing.R")
-#source("https://raw.githubusercontent.com/eogasawara/mylibrary/master/myFeature.R")
-#source("https://raw.githubusercontent.com/eogasawara/mylibrary/master/myPrediction.R")
-
- 
 
 loadlibrary("parallelMap")
 loadlibrary("parallel")
@@ -906,7 +900,7 @@ measure_metrics_list<-function(predictions,time_elapsed,thresholdTest)
 }
   
 #  myrf_test$predictions
-  measure_metrics(myrf_test$predictions,"test",0,0)
+# measure_metrics(myrf_test$predictions,"test",0,0)
 measure_metrics <- function(predictions, label, x0, x1) {
   #X0 <- ifelse(predictions$X0 >= predictions$X1, 1.0, 0.0)
   X0 <- ifelse(predictions[1] >= predictions[2], 1.0, 0.0)
@@ -1259,4 +1253,3 @@ threshold_selection <- function(data,betha,numberSamplesPositive){
     }
   }
   return(threshold_current)
-}
