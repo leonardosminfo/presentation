@@ -7,6 +7,13 @@ source("https://raw.githubusercontent.com/leonardosminfo/presentation/master/cod
 
 source("https://raw.githubusercontent.com/leonardosminfo/presentation/master/code/myPrediction.R")
 
+#options(java.parameters = "-Xmx31g")
+
+#source("https://raw.githubusercontent.com/eogasawara/mylibrary/master/myPreprocessing.R")
+#source("https://raw.githubusercontent.com/eogasawara/mylibrary/master/myFeature.R")
+#source("https://raw.githubusercontent.com/eogasawara/mylibrary/master/myPrediction.R")
+
+ 
 
 loadlibrary("parallelMap")
 loadlibrary("parallel")
@@ -19,7 +26,6 @@ loadlibrary("ggplot2")
 loadlibrary("corrplot")
 loadlibrary("VIM")
 loadlibrary("lubridate")
-
 
 load_vra <- function() {
   if(!file.exists("vra-wu-a.RData")){
@@ -39,7 +45,6 @@ load_vra <- function() {
   load("vra-wu-a.RData") 
   return(list(vra_wu=vra_wu))
 }
-
 
 adjust_fields <- function(vra_wu) {
   vra_wu$departure_expect <- as.POSIXct(vra_wu$depart_expect)
@@ -682,6 +687,7 @@ dictionary2 <- function() {
   x <- rbind(x, data.frame(name="departure_month", type=2, description="basic"))
   x <- rbind(x, data.frame(name="departure_day", type=2, description="basic"))
   x <- rbind(x, data.frame(name="departure_weekday", type=12, description="basic"))
+  x <- rbind(x, data.frame(name="departure_weekday", type=15, description="basic"))
   x <- rbind(x, data.frame(name="departure_hour", type=2, description="original"))
   x <- rbind(x, data.frame(name="departure_hour_bin", type=3, description="bin"))
   x <- rbind(x, data.frame(name="departure_temperature", type=4, description="original"))
@@ -807,86 +813,136 @@ par_end <- function(start_time) {
   }
 
 
-measure_metrics_list<-function(predictions,time_elapsed)
+measure_metrics_list<-function(predictions,time_elapsed,thresholdTest)
 {
  
-  X0 <- ifelse(predictions[1] >= predictions[2], 1.0, 0.0)
-  X1 <- ifelse(predictions[2] > predictions[1], 1.0, 0.0)
+  #X0 <- ifelse(predictions[1] >= predictions[2], 1.0, 0.0)
+  #X1 <- ifelse(predictions[2] > predictions[1], 1.0, 0.0)
+  X0 <- ifelse(predictions[1] >= 0.5, 1.0, 0.0)
+  X1 <- ifelse(predictions[2] >= 0.5, 1.0, 0.0)
   TP <- sum((X1 == 1) & (X1 == predictions[4]))
-  TN <- sum((X1 == 0) & (X1 == predictions[4]))
+  TN <- sum((X0 == 0) & (X1 == predictions[3]))
   FP <- sum((X1 == 1) & (X1 != predictions[4]))
-  FN <- sum((X1 == 0) & (X1 != predictions[4]))
+  FN <- sum((X0 == 0) & (X0 != predictions[3]))
   
   #Precision
-  P<-(TP)/(TP+FP)
+  #P<-(TP)/(TP+FP)
+  ifelse((TP+FP)!=0 && (TP!=0),P<-(TP)/(TP+FP),P<-0)
+  
   #Recall
-  R<-(TP)/(TP+FN)
+  #R<-(TP)/(TP+FN)
+  ifelse((TP+FN)!=0 && (TP!=0),R<-(TP)/(TP+FN),R<-0)
+  
   #F1
-  F1<-(2*P*R)/(P+R)
+  #F1<-(2*P*R)/(P+R)
+  ifelse((P+R)!=0 && ((2*P*R)!=0),F1<-(2*P*R)/(P+R),F1<-0)
   
   specificity <- (TN)/(TN+FP)  
   sensitivity <- (TP)/(TP+FN)
   accuracy <- (TP+TN)/(TP+TN+FP+FN)
-  #print(c("clássica", label, train_accuracy, train_sensitivity,train_specificity))
-  #print(c("clássica - Precision/Recall/F1", label, P, R,F1))
+  #print(c("clÃ¡ssica", label, train_accuracy, train_sensitivity,train_specificity))
+  #print(c("clÃ¡ssica - Precision/Recall/F1", label, P, R,F1))
   results=list(accuracy=accuracy,sensitivity=sensitivity,specificity=specificity,P=P,R=R,F1=F1,time_elapsed=time_elapsed)
   
   X0 <- ifelse(predictions[1]>=0.8566669, 1.0, 0.0)
   X1 <- ifelse(predictions[2]>=0.1433331, 1.0, 0.0)
   TP <- sum((X1 == 1) & (X1 == predictions[4]))
-  TN <- sum((X1 == 0) & (X1 == predictions[4]))
+  TN <- sum((X0 == 0) & (X1 == predictions[3]))
   FP <- sum((X1 == 1) & (X1 != predictions[4]))
-  FN <- sum((X1 == 0) & (X1 != predictions[4]))
+  FN <- sum((X0 == 0) & (X0 != predictions[3]))
   
   
   #Precision
-  P<-(TP)/(TP+FP)
+  #P<-(TP)/(TP+FP)
+  ifelse((TP+FP)!=0 && (TP!=0),P<-(TP)/(TP+FP),P<-0)
+  
   #Recall
-  R<-(TP)/(TP+FN)
+  #R<-(TP)/(TP+FN)
+  ifelse((TP+FN)!=0 && (TP!=0),R<-(TP)/(TP+FN),R<-0)
+  
   #F1
-  F1<-(2*P*R)/(P+R)
+  #F1<-(2*P*R)/(P+R)
+  ifelse((P+R)!=0 && ((2*P*R)!=0),F1<-(2*P*R)/(P+R),F1<-0)
   
   specificity <- (TN)/(TN+FP)  
   sensitivity <- (TP)/(TP+FN)
   accuracy <- (TP+TN)/(TP+TN+FP+FN)
-  #print(c("classe majoritária", label, train_accuracy, train_sensitivity,train_specificity <- (TN)/(TN+FP)  ))
-  #print(c("classe majoritária- Precision/Recall/F1", label, P, R,F1))
+  #print(c("classe majoritÃ¡ria", label, train_accuracy, train_sensitivity,train_specificity <- (TN)/(TN+FP)  ))
+  #print(c("classe majoritÃ¡ria- Precision/Recall/F1", label, P, R,F1))
   
   results_majority=list(accuracy=accuracy,sensitivity=sensitivity,specificity=specificity,P=P,R=R,F1=F1,time_elapsed=time_elapsed)
   
-  return(measure=list(results=results,results_majority=results_majority))
+  
+  
+  X0 <- ifelse(predictions[1]>=thresholdTest, 1.0, 0.0)
+  X1 <- ifelse(predictions[2]>=(thresholdTest), 1.0, 0.0)
+  TP <- sum((X1 == 1) & (X1 == predictions[4]))
+  TN <- sum((X0 == 0) & (X1 == predictions[3]))
+  FP <- sum((X1 == 1) & (X1 != predictions[4]))
+  FN <- sum((X0 == 0) & (X0 != predictions[3]))
+  sensitivity <- (TP)/(TP+FN)
+  accuracy <- (TP+TN)/(TP+TN+FP+FN)
+  specificity <- (TN)/(TN+FP)  
+  
+  #Precision
+  #P<-(TP)/(TP+FP)
+  ifelse((TP+FP)!=0 && (TP!=0),P<-(TP)/(TP+FP),P<-0)
+  
+  #Recall
+  #R<-(TP)/(TP+FN)
+  ifelse((TP+FN)!=0 && (TP!=0),R<-(TP)/(TP+FN),R<-0)
+  
+  #F1
+  #F1<-(2*P*R)/(P+R)
+  ifelse((P+R)!=0 && ((2*P*R)!=0),F1<-(2*P*R)/(P+R),F1<-0)
+  
+  #print(c("classe majoritÃ¡ria - limiar selecionado", "teste limiar","accuracy:", test_limiar_accuracy,"precision:",test_limiar_precision,"recall:",test_limiar_sensitivity,"f1-score",test_limiar_f1))
+  
+  
+  results_threshold=list(accuracy=accuracy,sensitivity=sensitivity,specificity=specificity,P=P,R=R,F1=F1,time_elapsed=time_elapsed,threshold=thresholdTest)
+  return(measure=list(results=results,results_majority=results_majority,results_threshold=results_threshold))
 
   
 }
   
-  
-  
+#  myrf_test$predictions
+  measure_metrics(myrf_test$predictions,"test",0,0)
 measure_metrics <- function(predictions, label, x0, x1) {
   #X0 <- ifelse(predictions$X0 >= predictions$X1, 1.0, 0.0)
   X0 <- ifelse(predictions[1] >= predictions[2], 1.0, 0.0)
   X1 <- ifelse(predictions[2] > predictions[1], 1.0, 0.0)
+  #TP <- sum((X1 == 1) & (X1 == predictions[4]))
+  #TN <- sum((X1 == 0) & (X1 == predictions[4]))
+  #FP <- sum((X1 == 1) & (X1 != predictions[4]))
+  #FN <- sum((X1 == 0) & (X1 != predictions[4]))
   TP <- sum((X1 == 1) & (X1 == predictions[4]))
-  TN <- sum((X1 == 0) & (X1 == predictions[4]))
+  TN <- sum((X0 == 0) & (X1 == predictions[3]))
   FP <- sum((X1 == 1) & (X1 != predictions[4]))
-  FN <- sum((X1 == 0) & (X1 != predictions[4]))
-  
+  FN <- sum((X0 == 0) & (X0 != predictions[3]))
   #Precision
-  P<-(TP)/(TP+FP)
+  #P<-(TP)/(TP+FP)
+  ifelse((TP+FP)!=0 && (TP!=0),P<-(TP)/(TP+FP),P<-0)
+  
   #Recall
-  R<-(TP)/(TP+FN)
+  #R<-(TP)/(TP+FN)
+  ifelse((TP+FN)!=0 && (TP!=0),R<-(TP)/(TP+FN),R<-0)
+  
   #F1
-  F1<-(2*P*R)/(P+R)
+  #F1<-(2*P*R)/(P+R)
+  ifelse((P+R)!=0 && ((2*P*R)!=0),F1<-(2*P*R)/(P+R),F1<-0)
   
   train_specificity <- (TN)/(TN+FP)  
   train_sensitivity <- (TP)/(TP+FN)
   train_accuracy <- (TP+TN)/(TP+TN+FP+FN)
-  print(c("clássica", label, train_accuracy, train_sensitivity,train_specificity))
-  print(c("clássica - Precision/Recall/F1", label, P, R,F1))
+  print(c("clÃ¡ssica", label, train_accuracy, train_sensitivity,train_specificity))
+  print(c("clÃ¡ssica - Precision/Recall/F1", label, P, R,F1))
   
 
   
   X0 <- ifelse(predictions[1]>=0.8566669, 1.0, 0.0)
   X1 <- ifelse(predictions[2]>=0.1433331, 1.0, 0.0)
+  #X0 <- ifelse(predictions[1]>=0.472, 1.0, 0.0)
+  #X1 <- ifelse(predictions[2]>=0.289, 1.0, 0.0)
   TP <- sum((X1 == 1) & (X1 == predictions[4]))
   TN <- sum((X1 == 0) & (X1 == predictions[4]))
   FP <- sum((X1 == 1) & (X1 != predictions[4]))
@@ -894,17 +950,22 @@ measure_metrics <- function(predictions, label, x0, x1) {
   
   
   #Precision
-  P<-(TP)/(TP+FP)
+  #P<-(TP)/(TP+FP)
+  ifelse((TP+FP)!=0 && (TP!=0),P<-(TP)/(TP+FP),P<-0)
+  
   #Recall
-  R<-(TP)/(TP+FN)
+  #R<-(TP)/(TP+FN)
+  ifelse((TP+FN)!=0 && (TP!=0),R<-(TP)/(TP+FN),R<-0)
+  
   #F1
-  F1<-(2*P*R)/(P+R)
+  #F1<-(2*P*R)/(P+R)
+  ifelse((P+R)!=0 && ((2*P*R)!=0),F1<-(2*P*R)/(P+R),F1<-0)
   
   train_specificity <- (TN)/(TN+FP)  
   train_sensitivity <- (TP)/(TP+FN)
   train_accuracy <- (TP+TN)/(TP+TN+FP+FN)
-  print(c("classe majoritária", label, train_accuracy, train_sensitivity,train_specificity <- (TN)/(TN+FP)  ))
-  print(c("classe majoritária- Precision/Recall/F1", label, P, R,F1))
+  print(c("classe majoritÃ¡ria", label, train_accuracy, train_sensitivity,train_specificity <- (TN)/(TN+FP)  ))
+  print(c("classe majoritÃ¡ria- Precision/Recall/F1", label, P, R,F1))
 }
 
 
@@ -941,8 +1002,8 @@ measure_metrics_ensamble <- function(predictions_n,predictions_p, label, x0, x1)
   train_specificity <- (TN)/(TN+FP)  
   train_sensitivity <- (TP)/(TP+FN)
   train_accuracy <- (TP+TN)/(TP+TN+FP+FN)
-  print(c("clássica", label, train_accuracy, train_sensitivity,train_specificity))
-  #print(c("clássica - Precision/Recall/F1", label, P, R,F1))
+  print(c("clÃ¡ssica", label, train_accuracy, train_sensitivity,train_specificity))
+  #print(c("clÃ¡ssica - Precision/Recall/F1", label, P, R,F1))
   
   
 }
@@ -1157,4 +1218,45 @@ dictionary3 <- function() {
     x <- rbind(x, data.frame(name=column_name[i], type=13, description="cm - arrival_airport"))  
   }
   return(x)  
+}
+
+
+threshold_selection <- function(data,betha,numberSamplesPositive){
+  p_i <- 1
+  n_i <- 1
+  k <- 0
+  i <- 1
+  cp_module <- numberSamplesPositive
+  
+  value_condition <- data[i,'true_value'] 
+  
+  while(value_condition == 0){
+    i <- i +1 
+    n_i <- n_i +1
+    value_condition <- data[i,'true_value'] 
+  }
+  
+  threshold_current <- data[i,'prob_pos'] 
+  F_score_current <- (betha^2 + 1)*(p_i / n_i)*(p_i / cp_module)/((betha^2)*(p_i / n_i) + p_i / cp_module)
+  
+  i <- i + 1
+  
+  for(x in seq(from = i, to = nrow(data), by = 1)){
+    if(data[i,'true_value'] == 0){
+      k <- k + 1
+    }else if(k >= ((cp_module - p_i)/p_i)*(betha^2*cp_module + n_i - p_i)) {
+      break            
+    }else{
+      n_i <- n_i + k 
+      k <- 0
+      p_i <- p_i + 1
+      F_score_temp <- (betha^2 + 1)*(p_i / n_i)*(p_i / cp_module)/((betha^2)*(p_i / n_i) + p_i / cp_module)
+      
+      if(F_score_temp > F_score_current){
+        F_score_current <- F_score_temp
+        threshold_current <- data[x,'prob_pos']
+      }
+    }
+  }
+  return(threshold_current)
 }
